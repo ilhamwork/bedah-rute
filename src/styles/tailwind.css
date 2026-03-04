@@ -1,0 +1,35 @@
+@import 'tailwindcss' source(none);
+@source '../**/*.{js,ts,jsx,tsx}';
+
+@import 'tw-animate-css';
+
+/* Custom styles for Leaflet map */
+.leaflet-container {
+  font-family: inherit;
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+/* Optimize for image export */
+.exporting {
+  /* Ensure smooth rendering when exporting */
+  transform: translateZ(0);
+}
+
+/* Custom scrollbar for segment lists */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--trail-brown);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--trail-brown-light);
+}
