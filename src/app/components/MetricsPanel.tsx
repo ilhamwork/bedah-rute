@@ -8,7 +8,7 @@ import {
   Maximize2,
   Minimize2,
   Target,
-  GlassWater,
+  Waypoints,
 } from "lucide-react";
 
 interface MetricsPanelProps {
@@ -57,13 +57,13 @@ export function MetricsPanel({ metrics }: MetricsPanelProps) {
       icon: TrendingUp,
       label: "Elevation Gain",
       value: formatElevation(metrics.totalElevationGain),
-      color: "text-destructive",
+      color: "text-green-300",
     },
     {
       icon: TrendingDown,
       label: "Elevation Loss",
       value: formatElevation(metrics.totalElevationLoss),
-      color: "text-[var(--earth)]",
+      color: "text-red-300",
     },
     {
       icon: Maximize2,
@@ -78,10 +78,10 @@ export function MetricsPanel({ metrics }: MetricsPanelProps) {
       color: "text-muted-foreground",
     },
     {
-      icon: GlassWater,
-      label: "Water Station",
+      icon: Waypoints,
+      label: "Waypoints",
       value: metrics.totalAidStation,
-      color: "text-blue-600",
+      color: "text-primary",
     },
   ];
 

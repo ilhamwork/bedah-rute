@@ -177,7 +177,7 @@ export function MapView({
           zoomControl
         >
           <TileLayer
-            attribution="&copy; OpenStreetMap contributors"
+            attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url={
               useSatellite
                 ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"

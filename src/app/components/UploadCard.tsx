@@ -57,7 +57,7 @@ export function UploadCard({ onFileUpload, isLoading }: UploadCardProps) {
   );
 
   return (
-    <Card className="p-6 bg-forest">
+    <Card className="p-6 bg-forest mb-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -100,9 +100,9 @@ export function UploadCard({ onFileUpload, isLoading }: UploadCardProps) {
             <div className="text-center">
               {fileName ? (
                 <div>
-                  <p className="text-lg text-primary mb-1">File loaded:</p>
-                  <p className="text-sm text-muted-foreground">{fileName}</p>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-lg text-offwhite mb-1">File loaded:</p>
+                  <p className="text-sm text-offwhite/80">{fileName}</p>
+                  <p className="text-xs text-muted/40 mt-2">
                     Click or drag to upload a different file
                   </p>
                 </div>

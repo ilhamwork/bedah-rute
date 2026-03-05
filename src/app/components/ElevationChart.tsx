@@ -146,10 +146,10 @@ export function ElevationChart({ trackPoints, onHover }: ElevationChartProps) {
                 domain={["dataMin - 100", "dataMax + 100"]}
                 label={{
                   value: "Elevation (m)",
-                  position: "insideTopCenter",
-                  offset: 12,
-                  fontSize: 10,
+                  position: "insideLeft",
+                  fontSize: 12,
                   fill: "#9CA3AF",
+                  angle: -90,
                 }}
               />
 

@@ -8,7 +8,7 @@
   --card-foreground: #1a2e1a;
   --popover: #ffffff;
   --popover-foreground: #1a2e1a;
-  --primary: #2d4a2d;
+  --primary: #1B4332;
   --primary-foreground: #faf8f6;
   --secondary: #6b5442;
   --secondary-foreground: #faf8f6;
@@ -24,8 +24,8 @@
   --switch-background: #cbced4;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #2d4a2d;
-  --chart-1: #2d4a2d;
+  --ring: #1B4332;
+  --chart-1: #1B4332;
   --chart-2: #ff6b35;
   --chart-3: #6b5442;
   --chart-4: #8b9d83;
@@ -33,17 +33,17 @@
   --radius: 0.75rem;
   --sidebar: #faf8f6;
   --sidebar-foreground: #1a2e1a;
-  --sidebar-primary: #2d4a2d;
+  --sidebar-primary: #1B4332;
   --sidebar-primary-foreground: #faf8f6;
   --sidebar-accent: #e8e4df;
   --sidebar-accent-foreground: #1a2e1a;
   --sidebar-border: rgba(45, 74, 45, 0.15);
-  --sidebar-ring: #2d4a2d;
+  --sidebar-ring: #1B4332;
   
   /* Trail running theme colors */
-  --forest: #2d4a2d;
-  --forest-light: #3d5a3d;
-  --forest-dark: #1d3a1d;
+  --forest: #1B4332;
+  --forest-light: #2D6A4F;
+  --forest-dark: #0F2A20;
   --earth: #6b5442;
   --earth-light: #8b7462;
   --sun: #ff6b35;

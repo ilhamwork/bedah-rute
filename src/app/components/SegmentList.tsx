@@ -192,7 +192,7 @@ export function SegmentList({
                   </div>
                   <div>
                     <p className="text-white/40">Loss</p>
-                    <p className="font-medium text-blue-300">
+                    <p className="font-medium text-red-300">
                       -{Math.round(seg.elevationLoss)}m
                     </p>
                   </div>
