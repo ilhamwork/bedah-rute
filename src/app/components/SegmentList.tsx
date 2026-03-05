@@ -1,142 +1,207 @@
-import { Segment } from '../utils/segmentAnalyzer';
-import { Card } from './ui/card';
-import { motion } from 'motion/react';
-import { ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import React from "react";
+import { Card } from "./ui/card";
+import { Badge } from "./ui/badge";
+import {
+  ChevronRight,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Waypoints,
+} from "lucide-react";
+import { motion } from "motion/react";
+import { Segment } from "../utils/segmentAnalyzer";
 
 interface SegmentListProps {
   segments: Segment[];
+  activeSegment?: Segment | null;
   onSegmentClick?: (segment: Segment) => void;
-  selectedSegmentId?: string;
 }
 
-function getSegmentIcon(type: Segment['type']) {
+function getSegmentIcon(type: Segment["type"]) {
   switch (type) {
-    case 'steep-climb':
-    case 'climb':
+    case "steep-climb":
+    case "climb":
       return TrendingUp;
-    case 'steep-descent':
-    case 'descent':
+    case "steep-descent":
+    case "descent":
       return TrendingDown;
-    case 'flat':
+    case "flat":
+    default:
       return Minus;
   }
 }
 
-function getSegmentColor(type: Segment['type']): string {
+function getSegmentColor(type: Segment["type"]) {
   switch (type) {
-    case 'steep-climb':
-      return 'bg-destructive/10 border-destructive/30 text-destructive';
-    case 'climb':
-      return 'bg-accent/10 border-accent/30 text-accent';
-    case 'steep-descent':
-      return 'bg-[var(--trail-brown)]/10 border-[var(--trail-brown)]/30 text-[var(--trail-brown)]';
-    case 'descent':
-      return 'bg-primary/10 border-primary/30 text-primary';
-    case 'flat':
-      return 'bg-muted border-border text-muted-foreground';
+    case "steep-climb":
+      return "#ef4444";
+    case "climb":
+      return "#f59e0b";
+    case "steep-descent":
+      return "#8b5e3c";
+    case "descent":
+      return "#3b82f6";
+    case "flat":
+    default:
+      return "#6b7280";
+  }
+}
+
+function formatDistance(meters: number) {
+  if (meters >= 1000) {
+    return `${(meters / 1000).toFixed(2)} km`;
+  }
+  return `${Math.round(meters)} m`;
+}
+
+function getSegmentTypeLabel(type: Segment["type"]) {
+  switch (type) {
+    case "steep-climb":
+      return "Steep Climb";
+    case "climb":
+      return "Climb";
+    case "steep-descent":
+      return "Steep Descent";
+    case "descent":
+      return "Descent";
+    case "flat":
+    default:
+      return "Flat";
   }
 }
 
 export function SegmentList({
   segments,
+  activeSegment,
   onSegmentClick,
-  selectedSegmentId,
 }: SegmentListProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.3 }}
-    >
-      <Card className="overflow-hidden">
-        <div className="p-4 bg-muted/30 border-b">
-          <h3>Route Segments</h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            {segments.length} segment{segments.length !== 1 ? 's' : ''} based on waypoints
-          </p>
-        </div>
+    <Card className="shadow-lg overflow-hidden" id="segment-list">
+      <div className="p-4 bg-muted/30 border-b">
+        <h3 className="flex items-center gap-2">
+          <Waypoints className="w-4 h-4" />
+          Route Segments
+        </h3>
+        <p className="text-[11px] text-gray-400 mt-0.5">
+          {segments.length} segments • Based on waypoints
+        </p>
+      </div>
 
-        <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
-          {segments.map((segment, index) => {
-            const Icon = getSegmentIcon(segment.type);
-            const colorClass = getSegmentColor(segment.type);
-            const isSelected = segment.id === selectedSegmentId;
+      <div className="px-3 pb-3 space-y-2 max-h-[400px] overflow-y-auto">
+        {segments.map((seg, i) => {
+          const isActive = activeSegment?.name === seg.name;
+          const color = getSegmentColor(seg.type);
+          const Icon = getSegmentIcon(seg.type);
 
-            return (
-              <motion.div
-                key={segment.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className={`p-4 cursor-pointer transition-all hover:bg-muted/50 ${
-                  isSelected ? 'bg-primary/5 border-l-4 border-l-primary' : ''
-                }`}
-                onClick={() => onSegmentClick?.(segment)}
-              >
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`p-2 rounded-lg border ${colorClass} flex-shrink-0`}
-                  >
-                    <Icon className="w-4 h-4" />
+          return (
+            <motion.div
+              key={seg.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.03 }}
+              onClick={() => onSegmentClick?.(seg)}
+              className={`rounded-xl p-3 cursor-pointer transition-all duration-200 ${
+                isActive
+                  ? "bg-[#1B4332] text-white shadow-lg"
+                  : "bg-gray-50 hover:bg-gray-100"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="p-1.5 rounded-lg shrink-0"
+                  style={{
+                    backgroundColor: isActive
+                      ? "rgba(255,255,255,0.15)"
+                      : `${color}15`,
+                    color: isActive ? "white" : color,
+                  }}
+                >
+                  <Icon className="w-4 h-4" />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p
+                      className={`text-xs font-semibold truncate ${
+                        isActive ? "text-white" : "text-[#1B4332]"
+                      }`}
+                    >
+                      {seg.name}
+                    </p>
+
+                    <Badge
+                      className="shrink-0 text-[10px] px-1.5 py-0 border-0"
+                      style={{
+                        backgroundColor: isActive
+                          ? "rgba(255,255,255,0.2)"
+                          : `${color}15`,
+                        color: isActive ? "white" : color,
+                      }}
+                    >
+                      {getSegmentTypeLabel(seg.type)}
+                    </Badge>
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex-1">
-                        <p className="text-sm mb-1 truncate">
-                          {segment.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          KM {(segment.startDistance / 1000).toFixed(1)} → KM{' '}
-                          {(segment.endDistance / 1000).toFixed(1)}
-                        </p>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="text-muted-foreground">Distance: </span>
-                        <span>{(segment.distance / 1000).toFixed(2)} km</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Avg Gradient: </span>
-                        <span
-                          className={
-                            segment.avgGradient > 3
-                              ? 'text-accent'
-                              : segment.avgGradient < -3
-                              ? 'text-[var(--trail-brown)]'
-                              : ''
-                          }
-                        >
-                          {segment.avgGradient.toFixed(1)}%
-                        </span>
-                      </div>
-                      {segment.elevationGain > 0 && (
-                        <div>
-                          <span className="text-muted-foreground">Climb: </span>
-                          <span className="text-accent">
-                            +{Math.round(segment.elevationGain)}m
-                          </span>
-                        </div>
-                      )}
-                      {segment.elevationLoss > 0 && (
-                        <div>
-                          <span className="text-muted-foreground">Descent: </span>
-                          <span className="text-[var(--trail-brown)]">
-                            -{Math.round(segment.elevationLoss)}m
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                  <div
+                    className={`flex gap-3 text-[11px] ${
+                      isActive ? "text-white/60" : "text-gray-400"
+                    }`}
+                  >
+                    <span>{formatDistance(seg.distance)}</span>
+                    <span>
+                      {seg.endElevation - seg.startElevation >= 0 ? "+" : ""}
+                      {Math.round(seg.endElevation - seg.startElevation)}m
+                    </span>
+                    <span>
+                      {seg.avgGradient >= 0 ? "+" : ""}
+                      {seg.avgGradient.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </Card>
-    </motion.div>
+
+                <ChevronRight
+                  className={`w-4 h-4 shrink-0 transition-transform ${
+                    isActive ? "rotate-90 text-white/40" : "text-gray-300"
+                  }`}
+                />
+              </div>
+
+              {isActive && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="mt-3 pt-3 border-t border-white/10 grid grid-cols-2 gap-2 text-[11px]"
+                >
+                  <div>
+                    <p className="text-white/40">Start Elev</p>
+                    <p className="font-medium">
+                      {Math.round(seg.startElevation)}m
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-white/40">End Elev</p>
+                    <p className="font-medium">
+                      {Math.round(seg.endElevation)}m
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-white/40">Gain</p>
+                    <p className="font-medium text-green-300">
+                      +{Math.round(seg.elevationGain)}m
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-white/40">Loss</p>
+                    <p className="font-medium text-blue-300">
+                      -{Math.round(seg.elevationLoss)}m
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          );
+        })}
+      </div>
+    </Card>
   );
 }
