@@ -113,7 +113,7 @@ function App() {
       <Toaster position="top-right" />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-md">
+      <header className="sticky top-0 z-50 bg-forest text-primary-foreground shadow-md">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-sun/20 rounded-lg flex items-center justify-center">
@@ -126,31 +126,18 @@ function App() {
               </p>
             </div>
           </div>
-          {gpxData && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                <span className="hidden md:inline">Export</span>
-              </Button>
-            </div>
-          )}
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-6 md:py-8">
-        {!gpxData ? (
-          <div className="max-w-2xl mx-auto space-y-4">
-            <UploadCard onFileUpload={handleFileUpload} isLoading={isLoading} />
+        <div className="max-w-2xl mx-auto space-y-4">
+          <UploadCard onFileUpload={handleFileUpload} isLoading={isLoading} />
 
+          {!gpxData && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="py-12 px-4"
+              className="px-4"
             >
               <div className="text-center mb-10">
                 <motion.div
@@ -188,8 +175,10 @@ function App() {
                 ))}
               </div>
             </motion.div>
-          </div>
-        ) : (
+          )}
+        </div>
+
+        {gpxData && (
           <div id="analysis-container" className="space-y-6">
             {/* Metrics Panel */}
             {metrics && <MetricsPanel metrics={metrics} />}
@@ -198,14 +187,14 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left column: Map and Elevation Chart */}
               <div className="space-y-6">
+                <ElevationChart
+                  trackPoints={gpxData.trackPoints}
+                  onHover={setHighlightedPointIndex}
+                />
                 <MapView
                   gpxData={gpxData}
                   highlightedPointIndex={highlightedPointIndex ?? undefined}
                   highlightSegment={activeSegment}
-                />
-                <ElevationChart
-                  trackPoints={gpxData.trackPoints}
-                  onHover={setHighlightedPointIndex}
                 />
               </div>
 
@@ -216,37 +205,9 @@ function App() {
                   onSegmentClick={handleSegmentClick}
                   activeSegment={activeSegment}
                 />
-                {segments.length > 0 && <PaceEstimator segments={segments} />}
+                {/* {segments.length > 0 && <PaceEstimator segments={segments} />} */}
               </div>
             </div>
-
-            {/* Footer actions */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-col md:flex-row items-center justify-center gap-4 pt-6 pb-12"
-            >
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setGpxData(null);
-                  setMetrics(null);
-                  setSegments([]);
-                  setHighlightedPointIndex(null);
-                  setActiveSegment(null);
-                }}
-              >
-                Upload New Route
-              </Button>
-              <Button
-                onClick={handleExport}
-                className="bg-accent hover:bg-accent/90"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export Analysis as Image
-              </Button>
-            </motion.div>
           </div>
         )}
       </main>
@@ -255,7 +216,7 @@ function App() {
       <footer className="border-t bg-muted/30 py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
           <p className="mb-2">GPX analysis tool for race strategy planning</p>
-          <p className="text-xs">2026 @ilhamontrail</p>
+          <p className="text-xs">&copy;2026 @ilhamontrail</p>
         </div>
       </footer>
     </div>
