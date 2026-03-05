@@ -8,12 +8,19 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
+  ReferenceDot,
 } from "recharts";
 import { motion } from "motion/react";
 import { TrendingUp } from "lucide-react";
 
+interface Waypoint {
+  name: string;
+  distance: number; // meter
+}
+
 interface ElevationChartProps {
   trackPoints: TrackPoint[];
+  waypoints?: Waypoint[];
   onHover?: (pointIndex: number | null) => void;
 }
 
@@ -23,7 +30,11 @@ interface ChartDataPoint {
   pointIndex: number;
 }
 
-export function ElevationChart({ trackPoints, onHover }: ElevationChartProps) {
+export function ElevationChart({
+  trackPoints,
+  waypoints = [],
+  onHover,
+}: ElevationChartProps) {
   const sampleRate = Math.max(1, Math.floor(trackPoints.length / 500));
 
   const chartData: ChartDataPoint[] = trackPoints
@@ -81,6 +92,11 @@ export function ElevationChart({ trackPoints, onHover }: ElevationChartProps) {
       );
     }
     return null;
+  };
+
+  const getElevationAtDistance = (distanceKm: number) => {
+    const point = chartData.find((d) => d.distance >= distanceKm);
+    return point ? point.elevation : chartData[chartData.length - 1]?.elevation;
   };
 
   return (
@@ -163,6 +179,28 @@ export function ElevationChart({ trackPoints, onHover }: ElevationChartProps) {
                 fill="url(#elevationGradient)"
                 isAnimationActive={false}
               />
+
+              {waypoints.map((wp, i) => {
+                const x = wp.distance / 1000;
+                const y = getElevationAtDistance(x);
+
+                return (
+                  <ReferenceDot
+                    key={i}
+                    x={x}
+                    y={y}
+                    r={5}
+                    fill="#ef4444"
+                    stroke="white"
+                    strokeWidth={2}
+                    label={{
+                      value: wp.name,
+                      position: "top",
+                      fontSize: 10,
+                    }}
+                  />
+                );
+              })}
             </AreaChart>
           </ResponsiveContainer>
         </div>

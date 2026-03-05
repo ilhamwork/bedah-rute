@@ -189,6 +189,7 @@ function App() {
               <div className="space-y-6">
                 <ElevationChart
                   trackPoints={gpxData.trackPoints}
+                  waypoints={gpxData.waypoints}
                   onHover={setHighlightedPointIndex}
                 />
                 <MapView
