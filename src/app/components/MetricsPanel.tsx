@@ -8,6 +8,7 @@ import {
   Maximize2,
   Minimize2,
   Target,
+  GlassWater,
 } from "lucide-react";
 
 interface MetricsPanelProps {
@@ -30,7 +31,7 @@ function formatGradient(gradient: number): string {
 function getDifficultyColor(score: number): string {
   if (score >= 8) return "text-destructive";
   if (score >= 6) return "text-accent";
-  if (score >= 4) return "text-[var(--trail-orange)]";
+  if (score >= 4) return "text-[var(--sun)]";
   return "text-primary";
 }
 
@@ -50,19 +51,19 @@ export function MetricsPanel({ metrics }: MetricsPanelProps) {
       icon: Mountain,
       label: "Total Distance",
       value: formatDistance(metrics.totalDistance),
-      color: "text-primary",
+      color: "text-forest",
     },
     {
       icon: TrendingUp,
       label: "Elevation Gain",
       value: formatElevation(metrics.totalElevationGain),
-      color: "text-accent",
+      color: "text-destructive",
     },
     {
       icon: TrendingDown,
       label: "Elevation Loss",
       value: formatElevation(metrics.totalElevationLoss),
-      color: "text-[var(--trail-brown)]",
+      color: "text-[var(--earth)]",
     },
     {
       icon: Maximize2,
@@ -77,10 +78,10 @@ export function MetricsPanel({ metrics }: MetricsPanelProps) {
       color: "text-muted-foreground",
     },
     {
-      icon: Target,
-      label: "Max Gradient",
-      value: formatGradient(metrics.maxGradient),
-      color: "text-accent",
+      icon: GlassWater,
+      label: "Water Station",
+      value: metrics.totalAidStation,
+      color: "text-blue-600",
     },
   ];
 
