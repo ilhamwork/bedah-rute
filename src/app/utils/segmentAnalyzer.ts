@@ -26,6 +26,7 @@ export interface RouteMetrics {
   maxGradient: number;
   minGradient: number;
   difficultyScore: number;
+  totalAidStation: number;
 }
 
 function calculateGradient(elevationChange: number, distance: number): number {
@@ -200,7 +201,7 @@ function createSegment(
   return createSegmentFromPoints(segmentPoints, startIdx, endIdx, 'Start', 'Finish');
 }
 
-export function calculateRouteMetrics(trackPoints: TrackPoint[]): RouteMetrics {
+export function calculateRouteMetrics(trackPoints: TrackPoint[],  waypoints: Waypoint[]): RouteMetrics {
   if (trackPoints.length === 0) {
     return {
       totalDistance: 0,
@@ -211,6 +212,7 @@ export function calculateRouteMetrics(trackPoints: TrackPoint[]): RouteMetrics {
       maxGradient: 0,
       minGradient: 0,
       difficultyScore: 0,
+      totalAidStation: 0,
     };
   }
 
@@ -245,6 +247,8 @@ export function calculateRouteMetrics(trackPoints: TrackPoint[]): RouteMetrics {
   const steepnessScore = Math.min(Math.abs(maxGradient) / 30, 1) * 3; // max 3 points for 30%+
   const difficultyScore = Math.min(distanceScore + elevationScore + steepnessScore, 10);
 
+  const totalAidStation = waypoints.length;
+
   return {
     totalDistance,
     totalElevationGain,
@@ -254,5 +258,6 @@ export function calculateRouteMetrics(trackPoints: TrackPoint[]): RouteMetrics {
     maxGradient: maxGradient === -Infinity ? 0 : maxGradient,
     minGradient: minGradient === Infinity ? 0 : minGradient,
     difficultyScore,
+    totalAidStation,
   };
 }

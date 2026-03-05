@@ -40,27 +40,25 @@ const features = [
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [gpxData, setGpxData] = useState<GPXData | null>(null);
   const [segments, setSegments] = useState<Segment[]>([]);
   const [metrics, setMetrics] = useState<RouteMetrics | null>(null);
   const [highlightedPointIndex, setHighlightedPointIndex] = useState<
     number | null
   >(null);
-  const [selectedSegmentId, setSelectedSegmentId] = useState<
-    string | undefined
-  >(undefined);
+  const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
 
   const handleFileUpload = useCallback(async (file: File) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const data = await parseGPXFile(file);
       setGpxData(data);
-
       // Calculate metrics
-      const routeMetrics = calculateRouteMetrics(data.trackPoints);
+      const routeMetrics = calculateRouteMetrics(
+        data.trackPoints,
+        data.waypoints,
+      );
       setMetrics(routeMetrics);
 
       // Analyze segments
@@ -76,7 +74,6 @@ function App() {
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Unknown error occurred";
-      setError(errorMessage);
       toast.error("Failed to load GPX file", {
         description: errorMessage,
       });
@@ -87,21 +84,7 @@ function App() {
 
   const handleSegmentClick = useCallback(
     (segment: Segment) => {
-      setSelectedSegmentId(segment.id);
-
-      // Highlight the middle point of the segment
-      const midIndex = Math.floor(segment.trackPoints.length / 2);
-      const midPoint = segment.trackPoints[midIndex];
-
-      // Find the index in the full track points array
-      if (gpxData) {
-        const fullIndex = gpxData.trackPoints.findIndex(
-          (tp) => tp.distance === midPoint.distance && tp.ele === midPoint.ele,
-        );
-        if (fullIndex !== -1) {
-          setHighlightedPointIndex(fullIndex);
-        }
-      }
+      setActiveSegment(segment);
     },
     [gpxData],
   );
@@ -162,11 +145,7 @@ function App() {
       <main className="container mx-auto px-4 py-6 md:py-8">
         {!gpxData ? (
           <div className="max-w-2xl mx-auto space-y-4">
-            <UploadCard
-              onFileUpload={handleFileUpload}
-              isLoading={isLoading}
-              error={error}
-            />
+            <UploadCard onFileUpload={handleFileUpload} isLoading={isLoading} />
 
             <motion.div
               initial={{ opacity: 0 }}
@@ -222,6 +201,7 @@ function App() {
                 <MapView
                   gpxData={gpxData}
                   highlightedPointIndex={highlightedPointIndex ?? undefined}
+                  highlightSegment={activeSegment}
                 />
                 <ElevationChart
                   trackPoints={gpxData.trackPoints}
@@ -234,7 +214,7 @@ function App() {
                 <SegmentList
                   segments={segments}
                   onSegmentClick={handleSegmentClick}
-                  selectedSegmentId={selectedSegmentId}
+                  activeSegment={activeSegment}
                 />
                 {segments.length > 0 && <PaceEstimator segments={segments} />}
               </div>
@@ -253,9 +233,8 @@ function App() {
                   setGpxData(null);
                   setMetrics(null);
                   setSegments([]);
-                  setError(null);
                   setHighlightedPointIndex(null);
-                  setSelectedSegmentId(undefined);
+                  setActiveSegment(null);
                 }}
               >
                 Upload New Route
