@@ -6,16 +6,12 @@ import { motion } from "motion/react";
 interface UploadCardProps {
   onFileUpload: (file: File) => void;
   isLoading: boolean;
-  error: string | null;
 }
 
-export function UploadCard({
-  onFileUpload,
-  isLoading,
-  error,
-}: UploadCardProps) {
+export function UploadCard({ onFileUpload, isLoading }: UploadCardProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -31,6 +27,7 @@ export function UploadCard({
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
+      setError(null);
 
       const files = Array.from(e.dataTransfer.files);
       const gpxFile = files.find((file) =>
@@ -42,6 +39,7 @@ export function UploadCard({
         onFileUpload(gpxFile);
       } else {
         setFileName(null);
+        setError("Please upload a .gpx file");
       }
     },
     [onFileUpload],
@@ -123,16 +121,13 @@ export function UploadCard({
         </div>
 
         {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3"
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-xs text-red-300 mt-3 text-center"
           >
-            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          </motion.div>
+            {error}
+          </motion.p>
         )}
 
         <div className="mt-6 text-center text-xs text-offwhite/80">
