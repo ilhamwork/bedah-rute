@@ -1,114 +1,162 @@
-import { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import { TrackPoint, GPXData } from '../utils/gpxParser';
-import { Card } from './ui/card';
-import { Layers } from 'lucide-react';
-import { Switch } from './ui/switch';
-import { Label } from './ui/label';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Polyline,
+  Marker,
+  Popup,
+  useMap,
+} from "react-leaflet";
+import L from "leaflet";
+
+import { Card } from "./ui/card";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
+import { Layers } from "lucide-react";
+
+import { Segment } from "../utils/segmentAnalyzer";
+import { GPXData, TrackPoint } from "../utils/gpxParser";
 
 interface MapViewProps {
   gpxData: GPXData;
   highlightedPointIndex?: number;
+  highlightSegment?: Segment | null;
 }
 
-// Fix Leaflet default marker icon issue with Vite
+// Fix Leaflet marker issue (Vite)
 delete (L.Icon.Default.prototype as any)._getIconUrl;
+
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
-// Custom start marker (green)
+/* =========================
+   Custom Icons
+========================= */
+
 const startIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
 });
 
-// Custom finish marker (red)
 const finishIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
 });
 
-// Custom waypoint marker (orange)
+const highlightIcon = new L.DivIcon({
+  className: "",
+  html: `<div style="background:#000;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4)"></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+});
+
 const waypointIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
   iconSize: [20, 33],
   iconAnchor: [10, 33],
   popupAnchor: [1, -28],
   shadowSize: [33, 33],
 });
 
-function MapController({ bounds }: { bounds: GPXData['bounds'] }) {
+/* =========================
+   Fit Bounds
+========================= */
+
+function FitBounds({ points }: { points: TrackPoint[] }) {
   const map = useMap();
 
   useEffect(() => {
-    const leafletBounds = L.latLngBounds(
-      [bounds.south, bounds.west],
-      [bounds.north, bounds.east]
-    );
-    map.fitBounds(leafletBounds, { padding: [30, 30] });
-  }, [map, bounds]);
+    if (points.length > 0) {
+      const bounds = L.latLngBounds(points.map((p) => [p.lat, p.lon]));
+      map.fitBounds(bounds, { padding: [40, 40] });
+    }
+  }, [points, map]);
 
   return null;
 }
 
-function HighlightMarker({ point }: { point: TrackPoint }) {
-  const highlightIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
+/* =========================
+   Highlight Segment
+========================= */
 
-  return (
-    <Marker position={[point.lat, point.lon]} icon={highlightIcon}>
-      <Popup>
-        Distance: {(point.distance / 1000).toFixed(2)} km<br />
-        Elevation: {Math.round(point.ele)} m
-      </Popup>
-    </Marker>
-  );
+function HighlightSegment({ segment }: { segment?: Segment | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (segment && segment.trackPoints.length > 0) {
+      const bounds = L.latLngBounds(
+        segment.trackPoints.map((p) => [p.lat, p.lon]),
+      );
+
+      map.fitBounds(bounds, { padding: [60, 60] });
+    }
+  }, [segment, map]);
+
+  return null;
 }
 
-export function MapView({ gpxData, highlightedPointIndex }: MapViewProps) {
+/* =========================
+   MapView
+========================= */
+
+export function MapView({
+  gpxData,
+  highlightedPointIndex,
+  highlightSegment,
+}: MapViewProps) {
   const [useSatellite, setUseSatellite] = useState(false);
-  const { trackPoints, waypoints, bounds } = gpxData;
 
-  // Convert track points to Leaflet LatLng format
-  const routeCoordinates: [number, number][] = trackPoints.map(p => [p.lat, p.lon]);
+  const { trackPoints, waypoints } = gpxData;
 
-  const center: [number, number] = [
-    (bounds.north + bounds.south) / 2,
-    (bounds.east + bounds.west) / 2,
-  ];
+  if (!trackPoints || trackPoints.length === 0) return null;
+
+  const start = trackPoints[0];
+  const finish = trackPoints[trackPoints.length - 1];
+
+  const routePositions: [number, number][] = trackPoints.map((p) => [
+    p.lat,
+    p.lon,
+  ]);
+
+  const highlightPositions =
+    highlightSegment?.trackPoints.map(
+      (p) => [p.lat, p.lon] as [number, number],
+    ) ?? null;
 
   const highlightedPoint =
-    highlightedPointIndex !== undefined && highlightedPointIndex >= 0
+    highlightedPointIndex !== undefined
       ? trackPoints[highlightedPointIndex]
       : null;
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden gap-0">
       <div className="p-4 bg-muted/30 border-b flex items-center justify-between">
         <h3 className="flex items-center gap-2">
           <Layers className="w-4 h-4" />
           Route Map
         </h3>
+
         <div className="flex items-center gap-2">
           <Label htmlFor="satellite-toggle" className="text-xs cursor-pointer">
             Satellite
@@ -123,65 +171,85 @@ export function MapView({ gpxData, highlightedPointIndex }: MapViewProps) {
 
       <div className="h-[400px] md:h-[500px] w-full relative">
         <MapContainer
-          center={center}
+          center={[start.lat, start.lon]}
           zoom={13}
           className="h-full w-full"
-          zoomControl={true}
+          zoomControl
         >
-          <MapController bounds={bounds} />
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            attribution="&copy; OpenStreetMap contributors"
             url={
               useSatellite
-                ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-                : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             }
           />
+
+          {/* Full Route */}
           <Polyline
-            positions={routeCoordinates}
+            positions={routePositions}
             pathOptions={{
-              color: '#2d4a2d',
+              color: "rgb(255, 119, 0)",
               weight: 4,
               opacity: 0.8,
             }}
           />
-          {trackPoints.length > 0 && (
-            <Marker position={[trackPoints[0].lat, trackPoints[0].lon]} icon={startIcon}>
-              <Popup>
-                <strong>Start</strong><br />
-                Elevation: {Math.round(trackPoints[0].ele)} m
-              </Popup>
-            </Marker>
+
+          {/* Highlight Segment */}
+          {highlightPositions && (
+            <Polyline
+              positions={highlightPositions}
+              pathOptions={{
+                color: "rgb(40, 40, 233)",
+                weight: 6,
+                opacity: 1,
+              }}
+            />
           )}
-          {trackPoints.length > 0 && (
-            <Marker
-              position={[
-                trackPoints[trackPoints.length - 1].lat,
-                trackPoints[trackPoints.length - 1].lon,
-              ]}
-              icon={finishIcon}
-            >
+
+          {/* Start */}
+          <Marker position={[start.lat, start.lon]} icon={startIcon}>
+            <Popup>
+              <strong>Start</strong>
+              <br />
+              Elevation: {Math.round(start.ele)} m
+            </Popup>
+          </Marker>
+
+          {/* Finish */}
+          <Marker position={[finish.lat, finish.lon]} icon={finishIcon}>
+            <Popup>
+              <strong>Finish</strong>
+              <br />
+              Distance: {(finish.distance / 1000).toFixed(2)} km
+              <br />
+              Elevation: {Math.round(finish.ele)} m
+            </Popup>
+          </Marker>
+
+          {/* Waypoints */}
+          {waypoints.map((wp, i) => (
+            <Marker key={i} position={[wp.lat, wp.lon]} icon={waypointIcon}>
               <Popup>
-                <strong>Finish</strong><br />
-                Distance: {(trackPoints[trackPoints.length - 1].distance / 1000).toFixed(2)} km<br />
-                Elevation: {Math.round(trackPoints[trackPoints.length - 1].ele)} m
-              </Popup>
-            </Marker>
-          )}
-          {waypoints.map((waypoint, index) => (
-            <Marker
-              key={`waypoint-${index}`}
-              position={[waypoint.lat, waypoint.lon]}
-              icon={waypointIcon}
-            >
-              <Popup>
-                <strong>{waypoint.name}</strong><br />
-                Distance: {(waypoint.distance / 1000).toFixed(2)} km<br />
-                Elevation: {Math.round(waypoint.ele)} m
+                <strong>{wp.name}</strong>
+                <br />
+                Distance: {(wp.distance / 1000).toFixed(2)} km
+                <br />
+                Elevation: {Math.round(wp.ele)} m
               </Popup>
             </Marker>
           ))}
-          {highlightedPoint && <HighlightMarker point={highlightedPoint} />}
+
+          {/* Highlight Point */}
+          {highlightedPoint && (
+            <Marker
+              position={[highlightedPoint.lat, highlightedPoint.lon]}
+              icon={highlightIcon}
+            />
+          )}
+
+          <FitBounds points={trackPoints} />
+          <HighlightSegment segment={highlightSegment} />
         </MapContainer>
       </div>
     </Card>
