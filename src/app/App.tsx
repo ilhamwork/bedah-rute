@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import { useState, useCallback } from "react";
 import { UploadCard } from "./components/UploadCard";
 import { MetricsPanel } from "./components/MetricsPanel";
@@ -110,6 +111,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Analytics />
       <Toaster position="top-right" />
 
       {/* Header */}
