@@ -117,7 +117,7 @@ export function ElevationChart({
         </div>
 
         <div className="p-4 md:p-6">
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={100}>
             <AreaChart
               data={chartData}
               onMouseMove={handleMouseMove}
@@ -162,7 +162,8 @@ export function ElevationChart({
                 domain={["dataMin - 100", "dataMax + 100"]}
                 label={{
                   value: "Elevation (m)",
-                  position: "insideLeft",
+                  position: "insideBottomRight",
+                  offset: 50,
                   fontSize: 12,
                   fill: "#9CA3AF",
                   angle: -90,

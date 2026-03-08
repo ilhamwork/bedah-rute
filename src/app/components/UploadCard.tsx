@@ -57,14 +57,14 @@ export function UploadCard({ onFileUpload, isLoading }: UploadCardProps) {
   );
 
   return (
-    <Card className="p-6 bg-forest mb-10">
+    <Card className="p-4 bg-forest mb-5 max-w-sm mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
         <div
-          className={`relative border-2 border-dashed rounded-xl p-8 md:p-12 transition-all cursor-pointer ${
+          className={`relative border-2 border-dashed rounded-xl p-4 md:p-12 transition-all cursor-pointer ${
             isDragging
               ? "border-accent bg-accent/5 scale-[1.02]"
               : "border-muted/40 hover:border-muted/80 hover:bg-muted/20"
@@ -100,10 +100,10 @@ export function UploadCard({ onFileUpload, isLoading }: UploadCardProps) {
             <div className="text-center">
               {fileName ? (
                 <div>
-                  <p className="text-lg text-offwhite mb-1">File loaded:</p>
+                  <p className="text-lg text-offwhite/80 mb-1">File loaded:</p>
                   <p className="text-sm text-offwhite/80">{fileName}</p>
                   <p className="text-xs text-muted/40 mt-2">
-                    Click or drag to upload a different file
+                    Tap to upload a different file
                   </p>
                 </div>
               ) : (
@@ -113,7 +113,7 @@ export function UploadCard({ onFileUpload, isLoading }: UploadCardProps) {
                       ? "Processing GPX file..."
                       : "Drop your GPX file here"}
                   </p>
-                  <p className="text-sm text-muted/40">or click to browse</p>
+                  <p className="text-sm text-muted/40">or tap to browse</p>
                 </div>
               )}
             </div>
@@ -130,7 +130,7 @@ export function UploadCard({ onFileUpload, isLoading }: UploadCardProps) {
           </motion.p>
         )}
 
-        <div className="mt-6 text-center text-xs text-offwhite/80">
+        <div className="mt-2.5 text-center text-xs text-offwhite/40">
           <p>Please upload GPX files with waypoint data</p>
         </div>
       </motion.div>

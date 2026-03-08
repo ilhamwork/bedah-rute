@@ -134,12 +134,8 @@ function App() {
           <UploadCard onFileUpload={handleFileUpload} isLoading={isLoading} />
 
           {!gpxData && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="px-4"
-            >
-              <div className="text-center mb-10">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className="text-center mb-4">
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -148,12 +144,10 @@ function App() {
                 >
                   <Mountain className="w-10 h-10 text-[#1B4332]" />
                 </motion.div>
-                <h2 className="text-xl font-bold text-[#1B4332] mb-2">
-                  Upload a GPX file to begin
-                </h2>
                 <p className="text-sm text-gray-400 max-w-sm mx-auto">
-                  Analyze your trail running route for race strategy planning.
-                  Get detailed elevation, segments, and pacing data.
+                  Analyze your trail route. Plan your strategy.
+                  <br />
+                  Get detailed route map, elevation, and segments.
                 </p>
               </div>
 
@@ -187,15 +181,15 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left column: Map and Elevation Chart */}
               <div className="space-y-6">
-                <ElevationChart
-                  trackPoints={gpxData.trackPoints}
-                  waypoints={gpxData.waypoints}
-                  onHover={setHighlightedPointIndex}
-                />
                 <MapView
                   gpxData={gpxData}
                   highlightedPointIndex={highlightedPointIndex ?? undefined}
                   highlightSegment={activeSegment}
+                />
+                <ElevationChart
+                  trackPoints={gpxData.trackPoints}
+                  waypoints={gpxData.waypoints}
+                  onHover={setHighlightedPointIndex}
                 />
               </div>
 
@@ -214,10 +208,18 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-muted/30 py-8">
+      <footer className="border-t bg-muted/30 py-5">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p className="mb-2">GPX analysis tool for race strategy planning</p>
-          <p className="text-xs">&copy;2026 @ilhamontrail</p>
+          <p className="mb-2">Built by trail runner, for trail runners.</p>
+          <p className="text-sm">
+            &copy; 2026 by{" "}
+            <a
+              href="https://instagram.com/ilhamontrail"
+              className="hover:underline"
+            >
+              @ilhamontrail
+            </a>
+          </p>
         </div>
       </footer>
     </div>
