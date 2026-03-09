@@ -1,4 +1,4 @@
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 import { useState, useCallback } from "react";
 import { UploadCard } from "./components/UploadCard";
 import { MetricsPanel } from "./components/MetricsPanel";
